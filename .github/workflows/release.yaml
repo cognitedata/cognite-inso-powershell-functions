@@ -21,4 +21,4 @@ jobs:
         shell: pwsh
         run: |
           Invoke-Build -Task Build -Configuration Release -Sourcelocation https://github.com/cognitedata/cognite-inso-powershell-functions
-          Publish-Module -Path /build/CogniteInsoModule -NuGetApiKey $env:NUGET_KEY -Verbose
+          Publish-Module -Path ./build/CogniteInsoModule -NuGetApiKey $env:NUGET_KEY -Verbose
