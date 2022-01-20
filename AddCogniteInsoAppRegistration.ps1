@@ -75,7 +75,7 @@ function Add-Cognite-Inso-App-Registration {
             --reply-urls "http://localhost:4180$CALLBACK_PATH" `
             "https://$Customer-test.cogniteapp.com$CALLBACK_PATH" `
             "https://$Customer.cogniteapp.com$CALLBACK_PATH" `
-            --required-resource-accesses `@manifest.json | ConvertFrom-Json
+            --required-resource-accesses `@$MANIFEST_FILE | ConvertFrom-Json
 
     # Create or update Client Secret
     $CLIENT_SECRET = az ad app credential reset --id $NEW_APP_REGISTRATION.appId --credential-description cogniteapps --end-date "2099-01-01" | ConvertFrom-Json
