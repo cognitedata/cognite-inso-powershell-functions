@@ -20,5 +20,5 @@ jobs:
           NUGET_KEY: ${{ secrets.NUGET_KEY }}
         shell: pwsh
         run: |
-          Invoke-Build
+          Invoke-Build -Task Build -Configuration Release -Sourcelocation {{ env.GITHUB_SERVER_URL}}{{ env.GITHUB_REPOSITORY }}
           Publish-Module -Path /build/CogniteInsoModule -NuGetApiKey $env:NUGET_KEY -Verbose
