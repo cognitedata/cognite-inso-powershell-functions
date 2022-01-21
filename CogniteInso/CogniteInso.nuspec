@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package>
   <metadata>
-    <id>CogniteInsoModule</id>
+    <id>CogniteInso</id>
     <version>0.0.1</version>
     <authors>Scott Melhop</authors>
     <description>PowerShell Module for Cognite Inso Projects</description>

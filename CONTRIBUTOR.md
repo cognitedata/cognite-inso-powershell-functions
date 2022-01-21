@@ -1,6 +1,4 @@
-# Loading locally
+# Contribution Guide
 
-To load the module locally directly use the following in PowerShell
-```powershell
-Import-Module .\CogniteInsoModule
-```
+1. Create an issue
+1. Let Scott know
