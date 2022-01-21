@@ -5,7 +5,7 @@
     Build script (https://github.com/nightroman/Invoke-Build)
 
 .DESCRIPTION
-    This script contains the tasks for building the 'CogniteInsoModule' PowerShell module
+    This script contains the tasks for building the 'CogniteInso' PowerShell module
 #>
 
 Param (
@@ -38,7 +38,7 @@ Enter-Build {
     Invoke-PSDepend -Force
 
     # Setting build script variables
-    $script:moduleName = 'CogniteInsoModule'
+    $script:moduleName = 'CogniteInso'
     $script:moduleSourcePath = Join-Path -Path $BuildRoot -ChildPath $moduleName
     $script:moduleManifestPath = Join-Path -Path $moduleSourcePath -ChildPath "$moduleName.psd1"
     $script:nuspecPath = Join-Path -Path $moduleSourcePath -ChildPath "$moduleName.nuspec"
