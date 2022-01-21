@@ -1,60 +1,71 @@
 
 
-Function Add-CogniteInsoAppRegistration {
+Function Add-CogniteInsoAppRegistration2 {
     [CmdletBinding()]
 
     Param (
         [Parameter(Mandatory)]
-        $Customer,
+        $CustomerName,
         [Parameter(Mandatory)]
-        $Cluster,
+        $CdfCluster,
         [Parameter(Mandatory)]
-        $AppName
+        $DisplayName
     )
 
     Process {
-        $ManifestFile = "cognite-inso-manifest.json"
-
+        # Load Utility Functions
         $ModuleRoot = Split-Path $PSScriptRoot
-        .$ModuleRoot/ResourceAccess.ps1 
+        $SeparatorCharacter = [IO.Path]::DirectorySeparatorChar
+        .($ModuleRoot + $SeparatorCharacter + "ResourceAccess.ps1")
+        .($ModuleRoot + $SeparatorCharacter + "GrantAdminConsent.ps1")
+        .($ModuleRoot + $SeparatorCharacter + "CreateClientSecret.ps1")
 
-        # Clean up any manifest files
-        if (Test-Path $ManifestFile) {
-            Remove-Item $ManifestFile
-        }
-
+        $RequiredResourceAccess = @()
         # Get CDF Enterprise Application registered in Customer AD and build a resource access object
-        $CDFResourceAccess = ResourceAccess -Permissions user_impersonation -DisplayName "Cognitedata API: ${Cluster}"
-        
+        $RequiredResourceAccess += ResourceAccess -Permissions user_impersonation -DisplayName "Cognitedata API: ${CdfCluster}"
         # Generate MS Graph resource access object
-        $GraphResourceAccess= ResourceAccess -Permissions openid, email, offline_access, profile -DisplayName "Microsoft Graph"
+        $RequiredResourceAccess += ResourceAccess -Permissions openid, email, offline_access, profile -DisplayName "Microsoft Graph"
 
-        # Combine resource access objects and output as Json to manifest.json
-        @($GraphResourceAccess, $CDFResourceAccess) | ConvertTo-Json -Depth 5 | Out-File $ManifestFile
+        # Generate ReplyUrls
+        $RedirectPath = "/oauth2/callback"
+        $ReplyUrls = $(
+            "http://localhost:4180$RedirectPath",
+            "https://$CustomerName-test.cogniteapp.com$RedirectPath",
+            "https://$CustomerName.cogniteapp.com$RedirectPath"
+        )
 
-        # Set callback path used by oauth2 proxy
-        $CallbackPath = "/oauth2/callback"
+        # Check If App Registraion already exists
+        $AppReg = Get-AzADApplication -DisplayName $DisplayName
 
-        # Create or update App Registration
-        $AppRegistration = az ad app create `
-                --display-name $AppName `
-                --available-to-other-tenants false `
-                --oauth2-allow-implicit-flow false `
-                --reply-urls "http://localhost:4180$CallbackPath" `
-                "https://$Customer-test.cogniteapp.com$CallbackPath" `
-                "https://$Customer.cogniteapp.com$CallbackPath" `
-                --required-resource-accesses `@$ManifestFile | ConvertFrom-Json
+        if ($null -eq $AppReg) {
+            Write-Host "Application Registraion $DisplayName doesn't exist, creating..." -ForegroundColor Yellow
+            $AppReg = New-AzADApplication -DisplayName $DisplayName -AvailableToOtherTenants $FALSE
+            Write-Host "Created" -ForegroundColor Green
+        }
+        
+        Write-Host "Updating Reply Url's..." -ForegroundColor Yellow
+        Update-AzADApplication -ObjectId $AppReg.Id -ReplyUrls $ReplyUrls 
+        Write-Host "Updated" -ForegroundColor Green
 
-        # Create or update Client Secret
-        $ClientCredentials = az ad app credential reset --id $AppRegistration.appId --credential-description cogniteapps --end-date "2099-01-01" | ConvertFrom-Json
+        Write-Host "Updating API Permissions..." -ForegroundColor Yellow
+        Update-AzADApplication -ObjectId $AppReg.Id -RequiredResourceAccess $RequiredResourceAccess
+        Write-Host "Updated" -ForegroundColor Green
 
-        # Clean up
-        Remove-Item $ManifestFile
+        Write-Host "Waiting for AD to reach consistency" -ForegroundColor Yellow
+        Start-Sleep -Seconds 30
 
-        # Write out data to be shared with Cognite representative
-        Write-Host "Generated new credentials, please forward to Cognite Representative, we suggest using https://yopass.se/" -ForegroundColor Green
-        Write-Host "--client-id $($ClientCredentials.appId) --client-secret $($ClientCredentials.password) --tenant-id $($ClientCredentials.tenant)"
+        Write-Host "Granting Admin Consent on API Permissions..." -ForegroundColor Yellow
+        GrantAdminConsent -AppId $AppReg.AppId
+        Write-Host "Granted" -ForegroundColor Green
 
+        $SecretDescription = (Get-Date -Format "yyyy-MM-dd") + "-cognite-inso-apps"
+        Write-Host "Generating Credentials..." -ForegroundColor Yellow
+        $ClientSecret = CreateClientSecret -AppId $AppReg.AppId -SecretDescription $SecretDescription
+        Write-Host "Created" -ForegroundColor Green
 
+        $context = Get-AzContext
+
+        Write-Host "Please send the following to your Cognite Representative securly, we reccommend https://yopass.se" -ForegroundColor Yellow
+        Write-Host "App Name: $DisplayName --client-id $($AppReg.AppId) --client-secret $ClientSecret --tenant-id $($context.Tenant.Id)" -ForegroundColor Green
     }
-    }
+}

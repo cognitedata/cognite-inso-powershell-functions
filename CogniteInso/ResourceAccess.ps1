@@ -5,24 +5,27 @@ function ResourceAccess {
     )
 
     Process {
-        $graphSP = az ad sp list --display-name $DisplayName | ConvertFrom-Json
-        if ($graphSP.appId -is [array]) {
-            $appId = $graphSP.appId[0] # Deal with MS Graph multiple ID
-        }else {
-            $appId = $graphSP.appId
-        }
+        $ServicePrincipal = Get-AzADServicePrincipal -DisplayName $DisplayName
+
+
         $ResourceAccess = @{
-            resourceAppId = $appId
-            resourceAccess = @()
+            ResourceAppId = $ServicePrincipal.AppId
+            ResourceAccess = @()
         }
-        foreach ($item in $graphSP.oauth2Permissions) {
-            if ($Permissions -contains $item.value) {
+
+        foreach ($Permission in $Permissions) {
+            $Oauth2PermissionScope = $ServicePrincipal.Oauth2PermissionScope | Where-Object {$_.value -eq $Permission}
+
+            if ($null -ne $Oauth2PermissionScope) {
                 $ResourceAccess.ResourceAccess += @{
-                        id = $item.id
-                        type = "Scope"
-                    }
+                    Id = $Oauth2PermissionScope.Id
+                    Type = "Scope"
+                }
+            }else{
+                Write-Host "Error finding permission scope for $Permission, skipping" -ForegroundColor Red
             }
         }
+        
         return $ResourceAccess
     }
 }
