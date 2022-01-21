@@ -15,6 +15,7 @@ jobs:
         run: |
           Set-PSRepository PSGallery -InstallationPolicy Trusted
           Install-Module InvokeBuild -ErrorAction Stop
+          Install-Module Az -ErrorAction Stop
       - name: Build and publish
         env:
           NUGET_KEY: ${{ secrets.NUGET_KEY }}
