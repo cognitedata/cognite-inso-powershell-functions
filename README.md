@@ -23,6 +23,7 @@ Connect-AzAccount -Tenant <YOUR TENANT ID>
 * Adds the required Redirect URLs for the Oauth Proxy used to authenticate users
 * Includes MS Graph permissions to keep the user logged in and provide the application with basic info about the user
 * Includes API permission to the specified Cognite API
+* Grants API permissions for all users on behalf of the admin
 * Generates credentials valid for the next 99 years
 
 __Parameters__
@@ -42,6 +43,7 @@ Add-CogniteInsoAppRegistration -CustomerName acme -CdfCluster api -DisplayName c
 * Adds the required Application Roles - `Grafana Admin, Grafana Editor, Grafana Viewer`
 * Includes MS Graph permissions to keep the user logged in and provide the application with basic info about the user
 * Includes API permission to the specified Cognite API
+* Grants API permissions for all users on behalf of the admin
 * Generates credentials valid for the next 99 years
 
 __Parameters__
