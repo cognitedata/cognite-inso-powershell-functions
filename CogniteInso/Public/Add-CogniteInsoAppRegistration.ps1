@@ -1,6 +1,6 @@
 
 
-Function Add-CogniteInsoAppRegistration2 {
+Function Add-CogniteInsoAppRegistration {
     [CmdletBinding()]
 
     Param (
