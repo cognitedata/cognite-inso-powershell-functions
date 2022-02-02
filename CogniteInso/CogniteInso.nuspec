@@ -2,7 +2,7 @@
 <package>
   <metadata>
     <id>CogniteInso</id>
-    <version>0.0.2</version>
+    <version>0.1.0</version>
     <authors>Scott Melhop</authors>
     <description>PowerShell Module for Cognite Inso Projects</description>
     <copyright>(c) Scott Melhop.</copyright>

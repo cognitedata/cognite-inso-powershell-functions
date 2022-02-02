@@ -130,16 +130,8 @@ task GenerateNewModuleVersion -If ($Configuration -eq 'Release') {
     # Using the current NuGet package version from the feed as a version base when building via Azure DevOps pipeline
 
     # Define package repository name
-    $repositoryName = $moduleName + '-repository'
-
-    # Register a target PSRepository
-    try {
-        Register-PSRepository -Name $repositoryName -SourceLocation $SourceLocation -InstallationPolicy Trusted
-    }
-    catch {
-        throw "Cannot register '$repositoryName' repository with source location '$SourceLocation'!"
-    }
-
+    $repositoryName = 'PSGallery' 
+    
     # Define variable for existing package
     $existingPackage = $null
 
