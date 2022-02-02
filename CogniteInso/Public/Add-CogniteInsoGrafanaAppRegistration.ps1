@@ -19,6 +19,12 @@ Function Add-CogniteInsoGrafanaAppRegistration {
         .($ModuleRoot + $SeparatorCharacter + "ResourceAccess.ps1")
         .($ModuleRoot + $SeparatorCharacter + "GrantAdminConsent.ps1")
         .($ModuleRoot + $SeparatorCharacter + "CreateClientSecret.ps1")
+        .($ModuleRoot + $SeparatorCharacter + "Utilities.ps1")
+
+        if (-Not (IsCdfCluster -CdfCluster $CdfCluster)){
+            Write-Error "The cluster your provided: '$CdfCluster' is not a valid CDF Cluster"
+            return
+        }
 
         $RequiredResourceAccess = @()
         # Get CDF Enterprise Application registered in Customer AD and build a resource access object
