@@ -11,10 +11,8 @@ function CreateClientSecret {
     )
     
     process {
-
         $startDate = Get-Date
-            
-                
+                    
         $Credentials  = Get-AzADApplication -ApplicationId $appId | New-AzADAppCredential -CustomKeyIdentifier (Base64EncodeString -String $SecretDescription) -StartDate $startDate -EndDate $startDate.AddYears(99) 
 
         return $Credentials.SecretText

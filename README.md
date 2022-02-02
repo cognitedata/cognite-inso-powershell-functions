@@ -55,3 +55,15 @@ __Usage Example__
 ```powershell
 Add-CogniteInsoGrafanaAppRegistration -CustomerName acme -CdfCluster api -DisplayName cognite-inso-test                    
 ```
+
+### Initialize-CdfApiRegistration
+
+* Used to register a CDF Cluster API as an Enterprise Application on the Current users Azure AD Tenant
+
+__Parameters__
+* `-CdfCluster` - The CDF Cluster API you want to register as an Enterprise Application, eg use `api` for `https://api.cognitedata.com`
+
+__Usage Example__
+```powershell
+Initialize-CdfApiRegistration -CdfCluster api                    
+```
