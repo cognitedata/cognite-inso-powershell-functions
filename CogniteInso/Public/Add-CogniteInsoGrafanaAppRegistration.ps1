@@ -34,7 +34,7 @@ Function Add-CogniteInsoGrafanaAppRegistration {
 
         # Generate ReplyUrls
         $ReplyUrls = $(           
-            "https://$CustomerName-grafana.cogniteapp.com/login/azuread"
+            "https://grafana-$CustomerName.cogniteapp.com/login/azuread"
         )
 
         $AppRoles = @(
